@@ -11,6 +11,19 @@ export class MemberService extends BaseService {
     super(memberRepository);
   }
 
+  normalizeMemberNo(value) {
+    const cleanValue = String(value || '').trim().toUpperCase();
+    const digits = cleanValue.startsWith('NCS-') ? cleanValue.slice(4) : cleanValue;
+    if (!/^\d+$/.test(digits)) {
+      throw AppError.validation('Member code must be digits only or use NCS- followed by digits.');
+    }
+    const parsedNum = parseInt(digits, 10);
+    if (parsedNum <= 0) {
+      throw AppError.validation('Member code must be a positive number.');
+    }
+    return `NCS-${String(parsedNum).padStart(4, '0')}`;
+  }
+
   /**
    * Register a new member.
    * Optionally auto-charges membership fee by queuing a transaction.
@@ -54,16 +67,7 @@ export class MemberService extends BaseService {
         if (!manualMemberNo) {
           throw AppError.validation('Manual member number is required when manual code generation is selected.');
         }
-        const isNumeric = /^\d+$/.test(manualMemberNo);
-        if (!isNumeric) {
-          throw AppError.validation('Manual member number must contain digits only.');
-        }
-        const parsedNum = parseInt(manualMemberNo, 10);
-        if (parsedNum <= 0) {
-          throw AppError.validation('Manual member number must be a positive integer.');
-        }
-        const paddedSuffix = String(parsedNum).padStart(4, '0');
-        memberNo = `NCS-${paddedSuffix}`;
+        memberNo = this.normalizeMemberNo(manualMemberNo);
 
         // Verify uniqueness
         const existingNo = await this.repository.findOne({ memberNo });
@@ -162,7 +166,28 @@ export class MemberService extends BaseService {
         throw AppError.notFound('Member not found');
       }
 
+      if (validated.memberNo !== undefined) {
+        validated.memberNo = this.normalizeMemberNo(validated.memberNo);
+        if (validated.memberNo !== oldDoc.memberNo) {
+          const existingNo = await this.repository.findOne({ memberNo: validated.memberNo });
+          if (existingNo && existingNo._id.toString() !== id.toString()) {
+            throw AppError.conflict(`Member code ${validated.memberNo} already exists.`);
+          }
+        }
+      }
+
       const updated = await this.update(id, validated, null, userId);
+
+      if (validated.memberNo && validated.memberNo !== oldDoc.memberNo) {
+        await Transaction.updateMany(
+          {
+            memberId: oldDoc._id,
+            accountType: { $in: ['membership', 'share'] },
+            accountId: oldDoc.memberNo,
+          },
+          { $set: { accountId: validated.memberNo, updatedBy: userId } }
+        );
+      }
 
       await auditLogService.logAction(
         userId,

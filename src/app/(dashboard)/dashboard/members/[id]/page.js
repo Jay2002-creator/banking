@@ -326,6 +326,7 @@ export default function MemberDetailPage() {
         throw new Error(json.error?.message || 'Failed to update demographics');
       }
       setMember(json.data);
+      setEditFormData(json.data);
       setIsEditingDetails(false);
     } catch (err) {
       setDetailsError(err.message);
@@ -674,6 +675,10 @@ export default function MemberDetailPage() {
           {!isEditingDetails ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
+                <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide">Member Code</span>
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 font-mono">{member.memberNo}</span>
+              </div>
+              <div>
                 <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide">Full Name</span>
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200">{member.fullName}</span>
               </div>
@@ -771,6 +776,17 @@ export default function MemberDetailPage() {
           ) : (
             <form onSubmit={handleUpdateDetails} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">Member Code</label>
+                  <input
+                    type="text"
+                    value={editFormData.memberNo || ''}
+                    onChange={(e) => setEditFormData({ ...editFormData, memberNo: e.target.value.toUpperCase() })}
+                    required
+                    className="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-950 text-slate-750 font-mono uppercase"
+                  />
+                  <p className="mt-1 text-[10px] font-medium text-slate-400">Digits are saved as NCS-0000 format.</p>
+                </div>
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">Full Name</label>
                   <input

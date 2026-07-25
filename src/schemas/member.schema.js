@@ -14,6 +14,12 @@ export const aadhaarSchema = z
   .trim()
   .regex(/^\d{12}$/, { message: 'Aadhaar must be exactly 12 digits' });
 
+export const memberNoSchema = z
+  .string()
+  .trim()
+  .toUpperCase()
+  .regex(/^(?:\d+|NCS-\d+)$/, { message: 'Member code must be digits only or use NCS- followed by digits' });
+
 export const createMemberSchema = z.object({
   branchId: objectIdSchema,
   membershipDate: dateSchema.optional(),
@@ -65,7 +71,10 @@ export const createMemberSchema = z.object({
   manualMemberNo: z.string().trim().optional().nullable(),
 });
 
-export const updateMemberSchema = createMemberSchema.partial().omit({ branchId: true });
+export const updateMemberSchema = createMemberSchema
+  .extend({ memberNo: memberNoSchema.optional() })
+  .partial()
+  .omit({ branchId: true });
 
 export const saveNomineesSchema = z.array(
   z.object({
@@ -107,6 +116,7 @@ export const purchaseSharesSchema = z.object({
 export default {
   createMemberSchema,
   updateMemberSchema,
+  memberNoSchema,
   saveNomineesSchema,
   uploadDocumentSchema,
   purchaseSharesSchema,
