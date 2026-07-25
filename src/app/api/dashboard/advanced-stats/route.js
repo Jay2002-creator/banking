@@ -34,7 +34,7 @@ export async function GET(req) {
     const activeSavings = await SavingsAccount.countDocuments(
       branchId ? { branchId: new mongoose.Types.ObjectId(branchId), status: 'active' } : { status: 'active' }
     );
-    let branchName = 'Noble Cooperative Society';
+    let branchName = 'Nobles Credit Cooperative Society Limited';
     if (branchId) {
       const branch = await Branch.findById(branchId);
       if (branch) {

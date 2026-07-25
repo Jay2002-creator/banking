@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #f8fafc; /* slate-50 */
   --foreground: #0f172a; /* slate-900 */
@@ -62,6 +64,54 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --radius-xl: var(--radius);
+
+  --color-slate-150: #f1f5f9;
+  --color-slate-250: #dbe3ee;
+  --color-slate-350: #a9b8cb;
+  --color-slate-355: #9fb0c4;
+  --color-slate-450: #7a8aa0;
+  --color-slate-455: #74859b;
+  --color-slate-505: #607086;
+  --color-slate-550: #536278;
+  --color-slate-650: #3f4c5f;
+  --color-slate-655: #3b4658;
+  --color-slate-705: #2f3a4c;
+  --color-slate-750: #263244;
+  --color-slate-850: #162033;
+
+  --color-indigo-450: #7378f2;
+  --color-indigo-550: #5b5ff0;
+  --color-indigo-650: #4538d6;
+  --color-indigo-750: #3526aa;
+  --color-indigo-755: #33249f;
+
+  --color-emerald-250: #a7f3d0;
+  --color-emerald-450: #21c58b;
+  --color-emerald-555: #0ca678;
+  --color-emerald-650: #047857;
+  --color-emerald-750: #036047;
+
+  --color-rose-250: #fecdd3;
+  --color-rose-350: #fda4af;
+  --color-rose-450: #fb7185;
+  --color-rose-455: #f5657d;
+  --color-rose-555: #e63b5a;
+  --color-rose-650: #be123c;
+  --color-rose-750: #9f1239;
+
+  --color-amber-450: #fbbf24;
+  --color-amber-550: #f59e0b;
+  --color-amber-555: #e99a0b;
+  --color-amber-650: #b45309;
+
+  --color-violet-650: #6d28d9;
+  --color-purple-450: #a78bfa;
+  --color-purple-650: #7e22ce;
+  --color-orange-450: #fb923c;
+  --color-orange-650: #c2410c;
+  --color-sky-450: #38bdf8;
+  --color-sky-650: #0284c7;
+  --color-teal-650: #0f766e;
 }
 
 body {
@@ -69,4 +119,137 @@ body {
   color: var(--foreground);
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   min-height: 100vh;
+}
+
+@layer base {
+  button,
+  [role="button"] {
+    color: inherit;
+  }
+}
+
+@layer components {
+  .btn {
+    display: inline-flex;
+    min-height: 2.25rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid transparent;
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1rem;
+    cursor: pointer;
+    transition:
+      color 150ms ease,
+      background-color 150ms ease,
+      border-color 150ms ease,
+      box-shadow 150ms ease,
+      opacity 150ms ease,
+      transform 150ms ease;
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .btn:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  .btn:disabled,
+  .btn[aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.5;
+    transform: none;
+  }
+
+  .btn-sm {
+    min-height: 2rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.6875rem;
+  }
+
+  .btn-lg {
+    min-height: 2.75rem;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    color: var(--primary-foreground);
+    border-color: color-mix(in srgb, var(--primary) 88%, #000 12%);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--primary) 18%, transparent);
+  }
+
+  .btn-primary:hover {
+    background: color-mix(in srgb, var(--primary) 86%, #000 14%);
+  }
+
+  .btn-secondary {
+    background: var(--secondary);
+    color: var(--secondary-foreground);
+    border-color: var(--border);
+  }
+
+  .btn-secondary:hover {
+    background: color-mix(in srgb, var(--secondary) 88%, var(--foreground) 12%);
+  }
+
+  .btn-outline {
+    background: var(--card);
+    color: var(--foreground);
+    border-color: var(--border);
+  }
+
+  .btn-outline:hover {
+    background: var(--muted);
+    border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+    color: var(--primary);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted-foreground);
+  }
+
+  .btn-ghost:hover {
+    background: var(--muted);
+    color: var(--foreground);
+  }
+
+  .btn-success {
+    background: #059669;
+    color: #ffffff;
+    border-color: #047857;
+  }
+
+  .btn-success:hover {
+    background: #047857;
+  }
+
+  .btn-danger {
+    background: var(--destructive);
+    color: var(--destructive-foreground);
+    border-color: color-mix(in srgb, var(--destructive) 88%, #000 12%);
+  }
+
+  .btn-danger:hover {
+    background: color-mix(in srgb, var(--destructive) 84%, #000 16%);
+  }
+
+  .btn-icon {
+    width: 2.25rem;
+    min-width: 2.25rem;
+    padding: 0;
+  }
+
+  .btn-icon.btn-sm {
+    width: 2rem;
+    min-width: 2rem;
+  }
 }

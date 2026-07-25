@@ -11,12 +11,12 @@ const ReceiptSettingSchema = new mongoose.Schema({
   institutionName: {
     type: String,
     required: true,
-    default: 'Noble Cooperative Society',
+    default: 'Nobles Credit Cooperative Society Limited',
     trim: true,
   },
   institutionAddress: {
     type: String,
-    default: '',
+    default: 'Nada khada, udaipur rajasthan',
     trim: true,
   },
   contactLine: {

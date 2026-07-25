@@ -7,8 +7,8 @@ import ReceiptSetting from '@/models/ReceiptSetting.js';
 
 const defaults = {
   templateName: 'Default Banking Receipt',
-  institutionName: 'Noble Cooperative Society',
-  institutionAddress: '',
+  institutionName: 'Nobles Credit Cooperative Society Limited',
+  institutionAddress: 'Nada khada, udaipur rajasthan',
   contactLine: '',
   logoUrl: '',
   receiptSize: 'A4',

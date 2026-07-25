@@ -50,7 +50,7 @@ export function FormWrapper({
             type="button"
             onClick={onCancel}
             disabled={loading}
-            className="px-4 py-2 text-sm font-semibold rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900 disabled:opacity-40 transition-all cursor-pointer"
+            className="btn btn-outline"
           >
             {cancelLabel}
           </button>
@@ -58,7 +58,7 @@ export function FormWrapper({
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2 text-sm font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-550 dark:hover:bg-indigo-650 text-white disabled:opacity-40 transition-all cursor-pointer flex items-center justify-center gap-2 min-w-[90px]"
+          className="btn btn-primary min-w-[90px]"
         >
           {loading && (
             <span className="w-4 h-4 border-2 border-white/20 border-t-white animate-spin rounded-full shrink-0" />

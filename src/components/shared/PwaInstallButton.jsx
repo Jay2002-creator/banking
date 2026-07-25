@@ -45,7 +45,7 @@ export default function PwaInstallButton() {
       type="button"
       onClick={handleInstall}
       title="Install desktop app"
-      className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-colors cursor-pointer"
+      className="btn btn-primary btn-sm hidden sm:inline-flex"
     >
       <MonitorDown className="w-4 h-4" />
       Install App

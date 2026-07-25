@@ -188,7 +188,7 @@ export function Sidebar({ isOpen, setIsOpen }) {
           </div>
           {isOpen && (
             <span className="font-bold text-slate-850 text-sm whitespace-nowrap tracking-wide animate-in fade-in duration-200">
-              {APP_CONFIG.NAME.split(' ')[0]} Society
+              {APP_CONFIG.DISPLAY_NAME}
             </span>
           )}
         </div>

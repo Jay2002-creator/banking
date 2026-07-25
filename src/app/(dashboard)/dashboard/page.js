@@ -41,6 +41,7 @@ import StatusBadge from '@/components/shared/StatusBadge.jsx';
 import FormWrapper from '@/components/shared/FormWrapper.jsx';
 import SearchInput from '@/components/shared/SearchInput.jsx';
 import LoadingSpinner from '@/components/shared/LoadingSpinner.jsx';
+import { APP_CONFIG } from '@/constants/app-config.js';
 
 import { emailSchema, mobileSchema, passwordSchema } from '@/schemas/common/index.js';
 
@@ -250,8 +251,8 @@ export default function DashboardHome() {
     <div className="space-y-6">
       {/* Page Header */}
       <PageHeader 
-        title="Noble Cooperative Society" 
-        subtitle="Operational summary and performance metrics for Noble Cooperative Society Udaipur Hub."
+        title={APP_CONFIG.NAME}
+        subtitle={`Operational summary and performance metrics for ${APP_CONFIG.NAME}.`}
         breadcrumbs={[
           { label: 'Platform Core', href: '#' },
           { label: 'Dashboard', href: '/dashboard' }
@@ -263,7 +264,7 @@ export default function DashboardHome() {
                 setStatsLoading(true);
                 fetchStats();
               }}
-              className="flex items-center gap-2 px-4 py-2 text-xs font-bold bg-white hover:bg-slate-50 dark:bg-slate-950 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl transition-all cursor-pointer shadow-sm text-slate-700 dark:text-slate-350 animate-in fade-in duration-200"
+              className="btn btn-outline btn-sm animate-in fade-in duration-200"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               Refresh Dashboard
@@ -287,7 +288,7 @@ export default function DashboardHome() {
             </div>
             <p className="text-xs text-slate-300 flex items-center gap-2">
               <MapPin className="w-3.5 h-3.5 text-indigo-400" />
-              <span>12, Saheli Marg, Near Saheliyon-ki-Bari, Udaipur, Rajasthan, 313001</span>
+              <span>{APP_CONFIG.ADDRESS}</span>
             </p>
           </div>
 

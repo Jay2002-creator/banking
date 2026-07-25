@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { APP_CONFIG } from '@/constants/app-config.js';
 
 /**
  * Authentication split screen layout.
@@ -21,7 +22,7 @@ export default function AuthLayout({ children }) {
             N
           </div>
           <span className="font-bold text-white text-lg tracking-wide">
-            Noble Cooperative Society
+            {APP_CONFIG.NAME}
           </span>
         </div>
 
@@ -37,7 +38,7 @@ export default function AuthLayout({ children }) {
 
         {/* Bottom Metadata */}
         <div className="relative z-10 text-[10px] text-slate-500 font-bold tracking-wider uppercase">
-          Noble Society Solutions • Core System Platform
+          Nobles Credit Cooperative Society Limited - Core System Platform
         </div>
       </div>
 
@@ -50,7 +51,7 @@ export default function AuthLayout({ children }) {
               N
             </div>
             <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-              Noble Cooperative Society
+              {APP_CONFIG.NAME}
             </h2>
             <p className="text-xs text-slate-400 dark:text-slate-500 font-bold mt-1">
               Core Cooperative Society Solution

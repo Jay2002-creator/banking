@@ -1,7 +1,7 @@
 {
-  "name": "Noble Cooperative Society",
-  "short_name": "Noble Society",
-  "description": "Core banking administration for Noble Cooperative Society.",
+  "name": "Nobles Credit Cooperative Society Limited",
+  "short_name": "Nobles Credit",
+  "description": "Core banking administration for Nobles Credit Cooperative Society Limited.",
   "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",

@@ -126,7 +126,7 @@ export default function SettingsPage() {
               <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-300">Society Governance</h4>
             </div>
             <p className="text-xs text-slate-350 leading-relaxed">
-              Noble Cooperative Society (NCS) operates as a registered financial cooperative under the state laws of Rajasthan, India. Operating limits and maker-checker validation rules are defined on a per-role basis.
+              {APP_CONFIG.NAME} ({settings.shortName}) operates as a registered financial cooperative under the state laws of Rajasthan, India. Operating limits and maker-checker validation rules are defined on a per-role basis.
             </p>
             <div className="pt-2">
               <span className="px-3 py-1.5 bg-indigo-900/60 border border-indigo-750 text-[10px] font-bold tracking-wide rounded-full text-indigo-300">

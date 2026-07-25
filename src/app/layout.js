@@ -14,13 +14,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Noble Cooperative Society",
+  title: "Nobles Credit Cooperative Society Limited",
   description: "Enterprise-grade core administration platform for co-operative societies, credit unions, and microfinance organizations.",
   manifest: "/manifest.webmanifest",
-  applicationName: "Noble Cooperative Society",
+  applicationName: "Nobles Credit Cooperative Society Limited",
   appleWebApp: {
     capable: true,
-    title: "Noble Cooperative Society",
+    title: "Nobles Credit Cooperative Society Limited",
     statusBarStyle: "default",
   },
   icons: {

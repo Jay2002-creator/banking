@@ -164,7 +164,7 @@ export default function CreateMemberPage() {
         </button>
         <PageHeader
           title="Register New Member"
-          subtitle="Add a new member profile to Noble Cooperative Society. Fields with * are mandatory."
+          subtitle="Add a new member profile. Fields with * are mandatory."
           breadcrumbs={[
             { label: 'Platform Core', href: '/dashboard' },
             { label: 'Members', href: '/dashboard/members' },
@@ -749,14 +749,14 @@ export default function CreateMemberPage() {
           <button
             type="button"
             onClick={() => router.push('/dashboard/members')}
-            className="px-6 py-2.5 text-xs font-bold bg-white dark:bg-slate-950 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 rounded-xl transition-all cursor-pointer shadow-sm hover:bg-slate-50 dark:hover:bg-slate-900"
+            className="btn btn-outline"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center gap-2 px-6 py-2.5 text-xs font-bold bg-indigo-650 hover:bg-indigo-700 text-white rounded-xl transition-all cursor-pointer shadow-sm shadow-indigo-650/15 disabled:opacity-50"
+            className="btn btn-primary"
           >
             <Save className="w-4 h-4" />
             {loading ? 'Registering...' : 'Register Member'}

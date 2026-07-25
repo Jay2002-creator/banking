@@ -49,7 +49,7 @@ export default function PrintableReceiptPage() {
           <div className="text-center border-b border-slate-300 pb-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             {settings.showLogo && settings.logoUrl && <img src={settings.logoUrl} alt="" className="h-12 mx-auto mb-2 object-contain" />}
-            <h1 className="text-xl font-black uppercase">{settings.institutionName || 'Noble Cooperative Society'}</h1>
+            <h1 className="text-xl font-black uppercase">{settings.institutionName || 'Nobles Credit Cooperative Society Limited'}</h1>
             <p className="text-xs mt-1 whitespace-pre-wrap">{settings.institutionAddress || [branch.address, branch.city, branch.state].filter(Boolean).join(', ')}</p>
             <p className="text-xs">{settings.contactLine || branch.contactNumber || ''}</p>
           </div>

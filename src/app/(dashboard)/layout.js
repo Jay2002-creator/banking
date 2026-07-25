@@ -12,11 +12,14 @@ export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [theme, setTheme] = useState('light');
 
-  // Load theme from localStorage or system preference on mount - Forced to light
+  // Load theme from localStorage or system preference on mount.
   useEffect(() => {
-    setTheme('light');
-    localStorage.setItem('theme', 'light');
-    document.documentElement.classList.remove('dark');
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+
+    setTheme(initialTheme);
+    document.documentElement.classList.toggle('dark', initialTheme === 'dark');
 
     // Auto-collapse sidebar on mobile viewports
     if (window.innerWidth < 1024) {
@@ -25,9 +28,9 @@ export default function DashboardLayout({ children }) {
   }, []);
 
   const handleThemeChange = (newTheme) => {
-    setTheme('light');
-    localStorage.setItem('theme', 'light');
-    document.documentElement.classList.remove('dark');
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
   };
 
   return (
