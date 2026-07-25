@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test-phase9": "node scripts/test-phase9.mjs",
+    "seed:coa": "node src/scripts/seed-phase2.mjs",
     "seed-phase9": "node scripts/seed-phase9.mjs"
   },
   "dependencies": {

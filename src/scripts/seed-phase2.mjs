@@ -26,7 +26,7 @@ try {
   console.warn('Could not load .env file directly:', e);
 }
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_DIRECT_URI || process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
   console.error('CRITICAL: MONGODB_URI not found in environment.');

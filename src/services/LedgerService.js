@@ -4,6 +4,7 @@ import ledgerEntryRepository from '../repositories/LedgerEntryRepository.js';
 import accountHeadRepository from '../repositories/AccountHeadRepository.js';
 import sequenceService from './SequenceService.js';
 import accountingRulesService from './AccountingRulesService.js';
+import defaultAccountHeadService from './DefaultAccountHeadService.js';
 import { createVoucherSchema } from '../schemas/journal-voucher.schema.js';
 import { AppError } from '../utils/error-handler.js';
 import mongoose from 'mongoose';
@@ -166,7 +167,7 @@ export class LedgerService extends BaseService {
       const isExternalDepositPayment = DEPOSIT_TRANSFER_TYPES.includes(transaction.transactionType)
         && BANK_PAYMENT_MODES.includes(paymentMode);
       const debitCode = isExternalDepositPayment ? '11002' : rule.debitCode;
-      const debitHead = await accountHeadRepository.findOne({ code: debitCode });
+      const debitHead = await this.resolveAccountHead(debitCode, session);
       if (!debitHead) {
         throw AppError.notFound(`Debit Account Head code ${debitCode} not found in Chart of Accounts.`);
       }
@@ -200,7 +201,7 @@ export class LedgerService extends BaseService {
 
         // Credit Principal
         if (principal > 0) {
-          const principalHead = await accountHeadRepository.findOne({ code: rule.creditCodes.principal });
+          const principalHead = await this.resolveAccountHead(rule.creditCodes.principal, session);
           if (!principalHead) {
             throw AppError.notFound(`Principal Credit Head code ${rule.creditCodes.principal} not found.`);
           }
@@ -215,7 +216,7 @@ export class LedgerService extends BaseService {
 
         // Credit Interest
         if (interest > 0) {
-          const interestHead = await accountHeadRepository.findOne({ code: rule.creditCodes.interest });
+          const interestHead = await this.resolveAccountHead(rule.creditCodes.interest, session);
           if (!interestHead) {
             throw AppError.notFound(`Interest Credit Head code ${rule.creditCodes.interest} not found.`);
           }
@@ -229,7 +230,7 @@ export class LedgerService extends BaseService {
         }
       } else {
         // Standard single debit, single credit posting
-        const creditHead = await accountHeadRepository.findOne({ code: rule.creditCode });
+        const creditHead = await this.resolveAccountHead(rule.creditCode, session);
         if (!creditHead) {
           throw AppError.notFound(`Credit Account Head code ${rule.creditCode} not found in Chart of Accounts.`);
         }
@@ -318,6 +319,16 @@ export class LedgerService extends BaseService {
     } catch (error) {
       this.handleError(error, 'Failed to post compensating reversal entries');
     }
+  }
+
+  async resolveAccountHead(code, session = null) {
+    let accountHead = await accountHeadRepository.model.findOne({ code, isDeleted: false }).session(session);
+    if (accountHead) return accountHead;
+
+    accountHead = await defaultAccountHeadService.ensure(code, session);
+    if (accountHead) return accountHead;
+
+    return accountHeadRepository.model.findOne({ code, isDeleted: false }).session(session);
   }
 
   /**
