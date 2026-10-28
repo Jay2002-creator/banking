@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import baseSchemaPlugin from './base.schema.js';
+import { APP_CONFIG } from '../constants/app-config.js';
 
 const ShareCertificateSchema = new mongoose.Schema({
   certificateNo: {
@@ -29,7 +30,7 @@ const ShareCertificateSchema = new mongoose.Schema({
   shareValue: {
     type: Number,
     required: true,
-    default: 10,
+    default: APP_CONFIG.DEFAULT_SHARE_PRICE || 100,
   },
   totalAmount: {
     type: Number,

@@ -34,6 +34,8 @@ export const createLoanApplicationSchema = z.object({
   requestedTenureMonths: z.number().int().positive('Tenure must be a positive integer'),
   purpose: z.string().trim().max(1000).optional().nullable(),
   remarks: z.string().trim().max(1000).optional().nullable(),
+  applicationNoType: z.enum(['auto', 'manual']).optional().default('auto'),
+  manualApplicationNo: z.string().trim().optional().nullable(),
 });
 
 export const updateLoanApplicationSchema = z.object({

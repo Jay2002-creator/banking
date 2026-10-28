@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { objectIdSchema, emailSchema, mobileSchema, dateSchema } from './common/index.js';
+import { APP_CONFIG } from '../constants/app-config.js';
 
 // PAN Number format validator
 export const panSchema = z
@@ -109,7 +110,7 @@ export const uploadDocumentSchema = z.object({
 export const purchaseSharesSchema = z.object({
   memberId: objectIdSchema,
   sharesPurchased: z.number().int().positive('Must purchase at least 1 share'),
-  shareValue: z.number().positive().default(10),
+  shareValue: z.number().positive('Share price must be a positive number').default(APP_CONFIG.DEFAULT_SHARE_PRICE || 100),
   paymentMode: z.enum(['CASH', 'TRANSFER', 'CHEQUE', 'UPI', 'RTGS', 'ONLINE']).default('CASH'),
 });
 

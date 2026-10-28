@@ -18,6 +18,40 @@ export class LoanApplicationService extends BaseService {
     super(loanApplicationRepository);
   }
 
+  normalizeApplicationNo(value) {
+    const cleanValue = String(value || '').trim().toUpperCase();
+    if (!cleanValue) {
+      throw AppError.validation('Manual loan application number is required when manual code generation is selected.');
+    }
+    const year = new Date().getFullYear();
+    // Pure digits e.g. "42", "105" -> LA-2026-000105
+    if (/^\d+$/.test(cleanValue)) {
+      const parsed = parseInt(cleanValue, 10);
+      if (parsed <= 0) {
+        throw AppError.validation('Loan application number must be a positive number.');
+      }
+      return `LA-${year}-${String(parsed).padStart(6, '0')}`;
+    }
+    // Suffix without year e.g. "LA-105" or "LN-105"
+    if (/^(?:LA|LN)-\d+$/.test(cleanValue)) {
+      const parts = cleanValue.split('-');
+      const parsed = parseInt(parts[1], 10);
+      return `LA-${year}-${String(parsed).padStart(6, '0')}`;
+    }
+    // Full standard format e.g. "LA-2024-000042" or "LN-2025-000105"
+    if (/^(?:LA|LN)-\d{4}-\d+$/.test(cleanValue)) {
+      const parts = cleanValue.split('-');
+      const y = parts[1];
+      const parsed = parseInt(parts[2], 10);
+      return `LA-${y}-${String(parsed).padStart(6, '0')}`;
+    }
+    // Alphanumeric custom codes
+    if (!/^[A-Z0-9_-]+$/.test(cleanValue)) {
+      throw AppError.validation('Loan application number may only contain letters, numbers, hyphens, and underscores.');
+    }
+    return cleanValue;
+  }
+
   /**
    * Create a new loan application (starts in draft).
    */
@@ -47,11 +81,42 @@ export class LoanApplicationService extends BaseService {
         processingFee = Math.round((validated.requestedAmount * product.processingFeeValue) / 100 * 100) / 100;
       }
 
-      // Generate application number
-      const applicationNo = await sequenceService.generateSequence('LA', validated.branchId, session);
+      // Generate or assign application number
+      let applicationNo;
+      if (validated.applicationNoType === 'manual') {
+        if (!validated.manualApplicationNo) {
+          throw AppError.validation('Manual loan application number is required when manual entry is selected.');
+        }
+        applicationNo = this.normalizeApplicationNo(validated.manualApplicationNo);
+
+        // Verify uniqueness
+        const existingApp = await loanApplicationRepository.findOne({ applicationNo });
+        if (existingApp) {
+          throw AppError.conflict(`Loan application number ${applicationNo} already exists.`);
+        }
+      } else {
+        // Auto-generate: find max existing application number for the current year
+        const year = new Date().getFullYear();
+        const allMatchingApps = await loanApplicationRepository.model.find({
+          applicationNo: new RegExp(`^LA-${year}-\\d+$`)
+        }).session(session);
+
+        let maxNum = 0;
+        for (const a of allMatchingApps) {
+          const parts = a.applicationNo.split('-');
+          const num = parseInt(parts[2], 10);
+          if (!isNaN(num) && num > maxNum) {
+            maxNum = num;
+          }
+        }
+        const nextNum = maxNum + 1;
+        applicationNo = `LA-${year}-${String(nextNum).padStart(6, '0')}`;
+      }
+
+      const { applicationNoType, manualApplicationNo, ...docFields } = validated;
 
       const application = await loanApplicationRepository.create({
-        ...validated,
+        ...docFields,
         applicationNo,
         applicationStatus: 'draft',
         processingFee,

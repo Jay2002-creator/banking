@@ -53,8 +53,18 @@ export class LoanAccountService extends BaseService {
       const firstDueDate = new Date(disbursementDate);
       firstDueDate.setMonth(firstDueDate.getMonth() + 1);
 
-      // Generate loan number
-      const loanNo = await sequenceService.generateSequence('LN', application.branchId, session);
+      // Generate loan number: sync with applicationNo if it starts with LA-, otherwise sequence
+      let loanNo;
+      if (application.applicationNo && application.applicationNo.startsWith('LA-')) {
+        const suffix = application.applicationNo.slice(3);
+        loanNo = `LN-${suffix}`;
+        const existingLoan = await loanRepository.findOne({ loanNo }).session(session);
+        if (existingLoan) {
+          loanNo = await sequenceService.generateSequence('LN', application.branchId, session);
+        }
+      } else {
+        loanNo = await sequenceService.generateSequence('LN', application.branchId, session);
+      }
 
       // Create loan account
       const loan = await loanRepository.create({

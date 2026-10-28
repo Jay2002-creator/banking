@@ -13,6 +13,7 @@ export const APP_CONFIG = {
   SYSTEM_TZ: 'Asia/Kolkata',
   AUDIT_USER_HEADER: 'x-audit-user-id',
   AUDIT_BRANCH_HEADER: 'x-audit-branch-id',
+  DEFAULT_SHARE_PRICE: Number(process.env.NEXT_PUBLIC_DEFAULT_SHARE_PRICE || 100),
   organizationSettings: {
     organizationName: "Nobles Credit Cooperative Society Limited",
     shortName: "NCS",

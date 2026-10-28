@@ -253,3 +253,13 @@ body {
     min-width: 2rem;
   }
 }
+
+
+/* Utility to hide scrollbar while preserving scroll functionality */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

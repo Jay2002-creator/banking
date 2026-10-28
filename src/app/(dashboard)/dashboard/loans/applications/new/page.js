@@ -22,9 +22,17 @@ export default function NewLoanApplicationPage() {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [form, setForm] = useState({
-    memberId: '', branchId: '', loanProductId: '',
-    requestedAmount: '', requestedTenureMonths: '', purpose: '', remarks: '',
+    memberId: '',
+    branchId: '',
+    loanProductId: '',
+    requestedAmount: '',
+    requestedTenureMonths: '',
+    purpose: '',
+    remarks: '',
+    applicationNoType: 'auto',
+    manualApplicationNo: '',
   });
+  const [nextAutoCode, setNextAutoCode] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -55,14 +63,16 @@ export default function NewLoanApplicationPage() {
 
   useEffect(() => {
     async function loadData() {
-      const [mRes, bRes, pRes] = await Promise.all([
+      const [mRes, bRes, pRes, nextRes] = await Promise.all([
         fetch('/api/members?limit=200&status=active'),
         fetch('/api/branches?limit=100'),
         fetch('/api/loan-products?isActive=true&limit=100'),
+        fetch('/api/loan-applications/next-code'),
       ]);
       if (mRes.ok) { const j = await mRes.json(); setMembers(j.data?.docs || j.data || []); }
       if (bRes.ok) { const j = await bRes.json(); setBranches(j.data || []); }
       if (pRes.ok) { const j = await pRes.json(); setProducts(j.data?.docs || []); }
+      if (nextRes.ok) { const j = await nextRes.json(); if (j.data?.nextCode) setNextAutoCode(j.data.nextCode); }
     }
     loadData();
   }, []);
@@ -77,12 +87,21 @@ export default function NewLoanApplicationPage() {
   }, [form.loanProductId, products]);
 
   const handleSubmit = async (isDraft) => {
+    if (form.applicationNoType === 'manual' && !form.manualApplicationNo.trim()) {
+      setError('Please provide a manual loan / application number.');
+      return;
+    }
+
     setSubmitting(true); setError(''); setSuccess('');
     try {
       const res = await fetch('/api/loan-applications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, requestedAmount: parseFloat(form.requestedAmount), requestedTenureMonths: parseInt(form.requestedTenureMonths) }),
+        body: JSON.stringify({
+          ...form,
+          requestedAmount: parseFloat(form.requestedAmount),
+          requestedTenureMonths: parseInt(form.requestedTenureMonths, 10),
+        }),
       });
       const json = await res.json();
       if (res.ok) {
@@ -98,11 +117,12 @@ export default function NewLoanApplicationPage() {
     } catch { setError('Network error'); }
     finally { setSubmitting(false); }
   };
+
   // EMI Preview
   let emiPreview = null;
   if (selectedProduct && form.requestedAmount && form.requestedTenureMonths) {
     const P = parseFloat(form.requestedAmount);
-    const N = parseInt(form.requestedTenureMonths);
+    const N = parseInt(form.requestedTenureMonths, 10);
     const R = selectedProduct.interestRate;
     if (selectedProduct.interestType === 'flat') {
       const totalInt = (P * R * (N / 12)) / 100;
@@ -151,6 +171,57 @@ export default function NewLoanApplicationPage() {
                   {branches.map((b) => <option key={b._id} value={b._id}>{b.branchName}</option>)}
                 </select>
               </Field>
+
+              {/* Loan / Application Number Assignment */}
+              <div className="col-span-2 space-y-2 p-3.5 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-100 dark:border-slate-800">
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wide">
+                  Loan / Application Number Assignment *
+                </label>
+                <div className="flex flex-wrap gap-5 pt-0.5">
+                  <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-700 dark:text-slate-300">
+                    <input
+                      type="radio"
+                      name="applicationNoType"
+                      value="auto"
+                      checked={form.applicationNoType === 'auto'}
+                      onChange={(e) => setForm(p => ({ ...p, applicationNoType: e.target.value }))}
+                      className="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500"
+                    />
+                    <span>Auto-generate ({nextAutoCode ? nextAutoCode : 'Loading...'})</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-700 dark:text-slate-300">
+                    <input
+                      type="radio"
+                      name="applicationNoType"
+                      value="manual"
+                      checked={form.applicationNoType === 'manual'}
+                      onChange={(e) => setForm(p => ({ ...p, applicationNoType: e.target.value }))}
+                      className="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500"
+                    />
+                    <span>Manual Entry (Custom / Previous Loan)</span>
+                  </label>
+                </div>
+
+                {form.applicationNoType === 'manual' && (
+                  <div className="pt-2">
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Custom Application / Loan Number *
+                    </label>
+                    <input
+                      type="text"
+                      className={`${inputCls} font-mono`}
+                      value={form.manualApplicationNo}
+                      onChange={(e) => setForm(p => ({ ...p, manualApplicationNo: e.target.value }))}
+                      placeholder="e.g. 105 (becomes LA-2026-000105) or LA-2024-000042"
+                      required
+                    />
+                    <p className="mt-1 text-[10px] text-slate-400">
+                      Enter a numeric suffix like 42 or 105 (auto-formatted with year), or type a complete reference.
+                    </p>
+                  </div>
+                )}
+              </div>
+
               <div className="col-span-2">
                 <Field label="Loan Product *">
                   <select className={inputCls} value={form.loanProductId} onChange={(e) => setForm(p => ({ ...p, loanProductId: e.target.value }))}>

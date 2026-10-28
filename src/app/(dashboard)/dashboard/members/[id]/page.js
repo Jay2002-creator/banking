@@ -34,6 +34,7 @@ import CardWrapper from '@/components/shared/CardWrapper.jsx';
 import PageHeader from '@/components/shared/PageHeader.jsx';
 import StatusBadge from '@/components/shared/StatusBadge.jsx';
 import LoadingSpinner from '@/components/shared/LoadingSpinner.jsx';
+import { APP_CONFIG } from '@/constants/app-config.js';
 
 function calculateAge(dateOfBirth) {
   if (!dateOfBirth) return null;
@@ -99,7 +100,7 @@ export default function MemberDetailPage() {
   const [sharesLedger, setSharesLedger] = useState([]);
   const [certificates, setCertificates] = useState([]);
   const [sharePurchaseOpen, setSharePurchaseOpen] = useState(false);
-  const [sharePurchaseForm, setSharePurchaseForm] = useState({ sharesPurchased: 10, shareValue: 10, paymentMode: 'CASH' });
+  const [sharePurchaseForm, setSharePurchaseForm] = useState({ sharesPurchased: 10, shareValue: APP_CONFIG.DEFAULT_SHARE_PRICE || 100, paymentMode: 'CASH' });
   const [shareError, setShareError] = useState(null);
   const [shareLoading, setShareLoading] = useState(false);
 
@@ -612,7 +613,7 @@ export default function MemberDetailPage() {
       </CardWrapper>
 
       {/* Profile detail Tab Navigation */}
-      <div className="flex border-b border-slate-200 dark:border-slate-800 overflow-x-auto gap-2">
+      <div className="flex border-b border-slate-200 dark:border-slate-800 overflow-x-auto gap-2 no-scrollbar">
         {[
           { id: 'details', label: 'Basic Profile', icon: User },
           { id: 'nominees', label: 'Nominee Allocations', icon: Users },
@@ -1383,7 +1384,15 @@ export default function MemberDetailPage() {
               Share Certificates & Ledgers
             </h3>
             <button
-              onClick={() => setSharePurchaseOpen(true)}
+              onClick={() => {
+                setSharePurchaseForm({
+                  sharesPurchased: 10,
+                  shareValue: APP_CONFIG.DEFAULT_SHARE_PRICE || 100,
+                  paymentMode: 'CASH',
+                });
+                setShareError(null);
+                setSharePurchaseOpen(true);
+              }}
               className="flex items-center gap-1.5 px-4 py-2 bg-indigo-650 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" /> Purchase Shares
@@ -1828,16 +1837,21 @@ export default function MemberDetailPage() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-450 uppercase mb-1.5">Share Value (₹)</label>
+                <label className="block text-[10px] font-bold text-slate-450 uppercase mb-1.5">
+                  Share Value ({APP_CONFIG.CURRENCY.SYMBOL})
+                </label>
                 <input
                   type="number"
-                  min="1"
+                  min="0.01"
+                  step="any"
                   value={sharePurchaseForm.shareValue}
                   onChange={(e) => setSharePurchaseForm({ ...sharePurchaseForm, shareValue: parseFloat(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-800 rounded-xl font-mono"
+                  className="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-800 rounded-xl font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   required
-                  disabled
                 />
+                <span className="text-[10px] text-slate-400 mt-1 block">
+                  Default: {APP_CONFIG.CURRENCY.SYMBOL}{APP_CONFIG.DEFAULT_SHARE_PRICE} (Editable)
+                </span>
               </div>
 
               <div>
@@ -1857,7 +1871,7 @@ export default function MemberDetailPage() {
               </div>
 
               <div className="p-3 bg-indigo-50/50 rounded-xl text-xs font-semibold text-slate-650">
-                Total Share Cost: <span className="font-extrabold text-indigo-650 text-sm">₹{sharePurchaseForm.sharesPurchased * sharePurchaseForm.shareValue}.00</span>
+                Total Share Cost: <span className="font-extrabold text-indigo-650 text-sm">{APP_CONFIG.CURRENCY.SYMBOL}{((sharePurchaseForm.sharesPurchased || 0) * (sharePurchaseForm.shareValue || 0)).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
 
               <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-850">

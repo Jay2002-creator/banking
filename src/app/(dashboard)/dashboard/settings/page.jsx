@@ -106,6 +106,10 @@ export default function SettingsPage() {
                 <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{APP_CONFIG.CURRENCY.CODE} ({APP_CONFIG.CURRENCY.SYMBOL})</span>
               </div>
               <div className="flex justify-between items-center text-xs pb-2 border-b border-slate-100 dark:border-slate-850">
+                <span className="text-slate-400 font-bold">Default Share Price</span>
+                <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{APP_CONFIG.CURRENCY.SYMBOL}{APP_CONFIG.DEFAULT_SHARE_PRICE}</span>
+              </div>
+              <div className="flex justify-between items-center text-xs pb-2 border-b border-slate-100 dark:border-slate-850">
                 <span className="text-slate-400 font-bold">Interest Precision</span>
                 <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{APP_CONFIG.INTEREST_ROUNDING_DECIMALS} Decimals</span>
               </div>

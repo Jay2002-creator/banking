@@ -1,23 +1,24 @@
+import dns from 'node:dns';
 import mongoose from 'mongoose';
 
-// Fix querySrv ECONNREFUSED on local systems by fallback to public DNS resolvers
-let dnsPromise = null;
+// Fix querySrv EBADRESP / ECONNREFUSED on local systems and mobile hotspots
 if (typeof window === 'undefined' && process.env.NEXT_RUNTIME !== 'edge') {
-  dnsPromise = import('dns')
-    .then((dnsModule) => {
-      dnsModule.setServers(['8.8.8.8', '1.1.1.1']);
-    })
-    .catch((e) => {
-      console.warn('Could not set custom DNS servers for MongoDB resolution:', e);
-    });
+  try {
+    const setServers = dns.setServers || dns.default?.setServers;
+    if (typeof setServers === 'function') {
+      setServers(['8.8.8.8', '1.1.1.1']);
+    }
+  } catch (e) {
+    console.warn('Could not set custom DNS servers for MongoDB resolution:', e);
+  }
 }
 
 const MONGODB_URI = process.env.MONGODB_URI;
 const MONGODB_DIRECT_URI = process.env.MONGODB_DIRECT_URI;
 
-if (!MONGODB_URI) {
+if (!MONGODB_URI && !MONGODB_DIRECT_URI) {
   throw new Error(
-    'Please define the MONGODB_URI environment variable inside your configuration or .env file'
+    'Please define the MONGODB_URI or MONGODB_DIRECT_URI environment variable inside your configuration or .env file'
   );
 }
 
@@ -39,10 +40,6 @@ if (!cached) {
 export async function dbConnect() {
   if (cached.conn) {
     return cached.conn;
-  }
-
-  if (dnsPromise) {
-    await dnsPromise;
   }
 
   const opts = {
@@ -73,13 +70,15 @@ export async function dbConnect() {
     });
 
   if (!cached.promise) {
-    cached.promise = connectWithUri(MONGODB_URI).catch(async (error) => {
+    const primaryUri = MONGODB_URI || MONGODB_DIRECT_URI;
+    cached.promise = connectWithUri(primaryUri).catch(async (error) => {
       const isSrvDnsFailure =
-        error?.code === 'ECONNREFUSED' &&
-        typeof error?.hostname === 'string' &&
-        error.hostname.startsWith('_mongodb._tcp.');
+        error?.syscall === 'querySrv' ||
+        (typeof error?.hostname === 'string' && error.hostname.startsWith('_mongodb._tcp.')) ||
+        ['EBADRESP', 'ECONNREFUSED', 'ENOTFOUND', 'ETIMEOUT', 'ESERVFAIL', 'EREFUSED'].includes(error?.code) ||
+        (typeof error?.message === 'string' && error.message.includes('querySrv'));
 
-      if (!isSrvDnsFailure || !MONGODB_DIRECT_URI) {
+      if (!isSrvDnsFailure || !MONGODB_DIRECT_URI || primaryUri === MONGODB_DIRECT_URI) {
         throw error;
       }
 
